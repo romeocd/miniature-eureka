@@ -48,6 +48,43 @@ app.get('api/notes', (req, res) => {
     });
 });
 
+//POST /api/notes route to add new notes
+app.post('api/notes', (req,res) => {
+    fs.readFile('db.json', 'utf8', (err, data) => {
+        if (err) {
+            //Potential errors
+            res.status(500).json({ error: 'Unable to read the notes'})
+        } else {
+            try {
+                //Parse existing notes as JSON
+                const notes = JSON.parse(data);
+
+                //create unique ID for each new notes
+                const newNote = {
+                    id: uuidv4(),
+                    
+                };
+                //add the new note to the existing notes
+                notes.push(newNote);
+
+                // Write the updated notes back to the db.json file
+                fs.writeFile('db.json', JSON.stringify(notes), (err) => {
+                    if (err) {
+                      // Handle any file writing errors
+                      res.status(500).json({ error: 'Unable to save the note' });
+                    } else {
+                      // Respond with the newly created note
+                      res.json(newNote);
+                    }
+                  });
+                } catch (error) {
+                  // Handle any JSON parsing errors
+                  res.status(500).json({ error: 'Error parsing notes' });
+            }
+        }
+    });
+});
+
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
 );
