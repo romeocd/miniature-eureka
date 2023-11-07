@@ -9,6 +9,9 @@ const PORT = process.env.port || 3001;
 
 const app = express();
 
+//npm package for generating unique ID
+const { v4: uuidv4} = require('uuid')
+
 //Middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
