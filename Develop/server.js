@@ -15,10 +15,6 @@ const db = require('./db/db.json')
 app.use(express.json());
 app.use(express.static('public'));
 
-// GET route for notes.html
-app.get('/notes', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/notes.html'))
-);
 
 
 
@@ -80,6 +76,11 @@ app.delete('/api/notes/:id', (req, res) => {
 
     res.json(newNote);
 });
+
+// GET route for notes.html
+app.get('/notes', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/notes.html'))
+);
 
 // GET route for index.html
 app.get('*', (req, res) =>
