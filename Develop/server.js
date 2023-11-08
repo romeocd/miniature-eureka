@@ -54,6 +54,18 @@ app.post('/api/notes', (req, res) => {
     res.json(db)
 })
 
+//DELETE the note from db.json with the unique id property then rewrite db.json
+app.delete('/api/notes/:id', (req, res) => {
+  const newDb = db.filter((note) =>
+      note.id !== req.params.id)
+
+  // update the db.json file to reflect the modified notes array
+  fs.writeFileSync('./db/db.json', JSON.stringify(newDb))
+
+  // send that removed note object back to user
+  readFile.json(newDb)
+})
+
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
 );
