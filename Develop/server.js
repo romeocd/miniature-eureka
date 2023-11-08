@@ -48,34 +48,15 @@ app.post('/api/notes', (req, res) => {
 });
 
 app.delete('/api/notes/:id', (req, res) => {
-  fs.readFile('./db/db.json', 'utf8', (err, data) => {
-    if (err) {
-        console.error(err)
-    } else {
+  const newDb = db.filter((note) =>
+      note.id !== req.params.id)
 
-        var paresdNotes = JSON.parse(data);
-        const { noteID } =  req.params;
-        const noteIndex = paresdNotes.findIndex(p => p.noteID == noteID);
-        paresdNotes.splice(noteIndex, 1);     
+  // update the db.json file to reflect the modified notes array
+  fs.writeFileSync('./db/db.json', JSON.stringify(newDb))
 
-        obj = JSON.stringify(paresdNotes, null, 4);
-                        
-            fs.writeFile(
-                './db/db.json',
-                obj,
-                (writeErr) =>
-                    writeErr
-                        ? console.error(err)
-                        : console.log(
-                            `Note has been REMOVED from JSON file`
-                        ))
-
-    }})
-
-    const newNote = require('./db/notes');
-
-    res.json(newNote);
-});
+  // send that removed note object back to user
+  readFile.json(newDb)
+})
 
 // GET route for notes.html
 app.get('/notes', (req, res) =>
