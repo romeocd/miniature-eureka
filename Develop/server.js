@@ -20,10 +20,7 @@ app.get('/notes', (req, res) =>
   res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
 
-// GET route for index.html
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
-);
+
 
 // GET /api/notes route
 app.get('/api/notes', (req, res) => {
@@ -38,33 +35,56 @@ app.get('/api/notes', (req, res) => {
 
 // POST /api/notes route to add new notes
 app.post('/api/notes', (req, res) => {
-    //grabs notes from body of request
-    const newNote = req.body
+  //grabs notes from body of request
+  const newNote = req.body
+  
+  //gives each note a random ID
+  newNote.id = uuidv4()
 
-    //gives each note a random ID
-    newNote.id = uuidv4()
+  //adds the note object to the array
+  db.push(newNote)
 
-    //adds the note object to the array
-    db.push(newNote)
+  //update the json file with the new object
+  fs.writeFileSync('./db/db.json', JSON.stringify(db));
 
-    //update the json file with the new object
-    fs.writeFileSync('./db/db.json', JSON.stringify(db))
+  //responds with the note object used
+  res.json(newNote);
+});
 
-    //responds with the note object used
-    res.json(db)
-})
-
-//DELETE the note from db.json with the unique id property then rewrite db.json
 app.delete('/api/notes/:id', (req, res) => {
-  const newDb = db.filter((note) =>
-      note.id !== req.params.id)
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    if (err) {
+        console.error(err)
+    } else {
 
-  // update the db.json file to reflect the modified notes array
-  fs.writeFileSync('./db/db.json', JSON.stringify(newDb))
+        var paresdNotes = JSON.parse(data);
+        const { noteID } =  req.params;
+        const noteIndex = paresdNotes.findIndex(p => p.noteID == noteID);
+        paresdNotes.splice(noteIndex, 1);     
 
-  // send that removed note object back to user
-  readFile.json(newDb)
-})
+        obj = JSON.stringify(paresdNotes, null, 4);
+                        
+            fs.writeFile(
+                './db/db.json',
+                obj,
+                (writeErr) =>
+                    writeErr
+                        ? console.error(err)
+                        : console.log(
+                            `Note has been REMOVED from JSON file`
+                        ))
+
+    }})
+
+    const newNote = require('./db/notes');
+
+    res.json(newNote);
+});
+
+// GET route for index.html
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/index.html'))
+);
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
